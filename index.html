@@ -1,63 +1,1603 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>NameThatPope</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Name That Pope!</title>
   <style>
     :root {
-      color-scheme: light dark;
-      font-family: Arial, Helvetica, sans-serif;
-      background: #f4f0e8;
-      color: #1c1b18;
+      --gold: #ffd166;
+      --red: #ef476f;
+      --blue: #118ab2;
+      --green: #06d6a0;
+      --dark: #171923;
+      --cream: #fff7df;
+      --purple: #7b2cbf;
+      --white: #ffffff;
+      --shadow: rgba(0, 0, 0, 0.24);
     }
 
     * {
       box-sizing: border-box;
+      user-select: none;
     }
 
-    body {
+    html, body {
       margin: 0;
-      min-height: 100vh;
+      padding: 0;
+      width: 100%;
+      min-height: 100%;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 20% 15%, rgba(255, 209, 102, 0.45), transparent 28%),
+        radial-gradient(circle at 85% 20%, rgba(6, 214, 160, 0.25), transparent 25%),
+        linear-gradient(135deg, #261447 0%, #0b132b 60%, #111827 100%);
+      color: var(--cream);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.045) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: radial-gradient(circle at center, black, transparent 80%);
+    }
+
+    .page {
+      width: min(1180px, 96vw);
+      margin: 0 auto;
+      padding: 18px 0 40px;
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 14px;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .logo {
+      width: 62px;
+      height: 62px;
+      border-radius: 18px;
+      background: linear-gradient(160deg, var(--gold), #fff7b2 45%, #f77f00);
+      color: #321;
       display: grid;
       place-items: center;
-      padding: 24px;
+      font-size: 36px;
+      box-shadow: 0 12px 30px var(--shadow), inset 0 0 0 4px rgba(255,255,255,0.45);
+      transform: rotate(-5deg);
+      animation: bob 2.6s ease-in-out infinite;
     }
 
-    main {
-      width: min(100%, 920px);
-      display: grid;
-      gap: 18px;
+    @keyframes bob {
+      0%, 100% { transform: translateY(0) rotate(-5deg); }
+      50% { transform: translateY(-5px) rotate(3deg); }
     }
 
     h1 {
       margin: 0;
-      font-size: clamp(2rem, 6vw, 4rem);
-      line-height: 1;
+      font-size: clamp(32px, 6vw, 64px);
+      line-height: 0.95;
+      letter-spacing: -2px;
+      text-shadow: 0 5px 0 rgba(0,0,0,0.2);
+    }
+
+    .subtitle {
+      margin-top: 6px;
+      color: #cbd5e1;
+      font-weight: 700;
+      font-size: clamp(14px, 2.2vw, 18px);
+    }
+
+    .button-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    button {
+      border: 0;
+      border-radius: 16px;
+      padding: 12px 16px;
+      font-size: 16px;
+      font-weight: 900;
+      color: #1f2937;
+      background: var(--gold);
+      cursor: pointer;
+      box-shadow: 0 8px 0 #b7791f, 0 13px 24px var(--shadow);
+      transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.1s ease;
+    }
+
+    button:hover { filter: brightness(1.08); }
+    button:active {
+      transform: translateY(6px);
+      box-shadow: 0 2px 0 #b7791f, 0 8px 18px var(--shadow);
+    }
+
+    button.secondary {
+      color: white;
+      background: #334155;
+      box-shadow: 0 8px 0 #111827, 0 13px 24px var(--shadow);
+    }
+
+    button.green {
+      background: var(--green);
+      box-shadow: 0 8px 0 #047857, 0 13px 24px var(--shadow);
+    }
+
+    button.red {
+      color: white;
+      background: var(--red);
+      box-shadow: 0 8px 0 #9f1239, 0 13px 24px var(--shadow);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 350px;
+      gap: 16px;
+    }
+
+    .panel {
+      background: rgba(15, 23, 42, 0.76);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 28px;
+      box-shadow: 0 24px 70px rgba(0,0,0,0.35);
+      backdrop-filter: blur(10px);
+      overflow: hidden;
+    }
+
+    .game-panel {
+      min-height: 660px;
+      position: relative;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      padding: 14px;
+      background: rgba(255,255,255,0.06);
+      border-bottom: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .stat {
+      background: rgba(0,0,0,0.24);
+      border-radius: 18px;
+      padding: 11px 10px;
       text-align: center;
     }
 
-    .viewer {
-      overflow: hidden;
-      border: 1px solid rgba(28, 27, 24, 0.18);
-      border-radius: 8px;
-      background: #fff;
-      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.16);
+    .stat-label {
+      font-size: 12px;
+      color: #a8b3c7;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
     }
 
-    img {
-      display: block;
+    .stat-value {
+      font-size: 26px;
+      font-weight: 1000;
+      color: var(--gold);
+      margin-top: 2px;
+    }
+
+    .stage {
+      position: relative;
+      min-height: 580px;
+      padding: 18px;
+      overflow: hidden;
+    }
+
+    .screen {
+      display: none;
+      height: 100%;
+    }
+
+    .screen.active { display: block; }
+
+    .start-card, .end-card {
+      text-align: center;
+      padding: 34px 22px;
+      max-width: 760px;
+      margin: 22px auto;
+      border-radius: 28px;
+      background: linear-gradient(160deg, rgba(255,255,255,0.12), rgba(255,255,255,0.03));
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+
+    .start-card h2, .end-card h2 {
+      margin: 0 0 8px;
+      font-size: clamp(32px, 5vw, 55px);
+    }
+
+    .start-card p, .end-card p {
+      color: #d5deef;
+      font-size: 18px;
+      line-height: 1.45;
+      max-width: 640px;
+      margin: 12px auto;
+    }
+
+    .mode-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 22px auto;
+      max-width: 760px;
+    }
+
+    .mode {
+      background: rgba(0,0,0,0.25);
+      border: 2px solid rgba(255,255,255,0.14);
+      border-radius: 22px;
+      padding: 15px;
+      cursor: pointer;
+      transition: transform 0.12s ease, border-color 0.12s ease, background 0.12s ease;
+    }
+
+    .mode:hover, .mode.selected {
+      transform: translateY(-4px);
+      border-color: var(--gold);
+      background: rgba(255, 209, 102, 0.16);
+    }
+
+    .mode .emoji { font-size: 34px; }
+    .mode .name { font-size: 20px; font-weight: 1000; margin-top: 4px; }
+    .mode .desc { color: #b6c2d8; font-size: 13px; line-height: 1.25; margin-top: 5px; }
+
+    .question-wrap {
+      display: grid;
+      grid-template-columns: 250px minmax(0, 1fr);
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .pope-card {
+      background: linear-gradient(180deg, #fff7df, #f4d58d);
+      color: #221;
+      border-radius: 26px;
+      padding: 18px;
+      text-align: center;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.32);
+      position: relative;
+      overflow: hidden;
+      min-height: 378px;
+    }
+
+    .pope-card::after {
+      content: "";
+      position: absolute;
+      left: -25%;
+      top: 18%;
+      width: 150%;
+      height: 50%;
+      transform: rotate(-15deg);
+      background: rgba(255,255,255,0.35);
+      pointer-events: none;
+    }
+
+    .pope-avatar {
+      position: relative;
+      z-index: 1;
+      height: 205px;
+      margin: 4px auto 10px;
+    }
+
+    .mitre {
+      width: 106px;
+      height: 118px;
+      margin: 0 auto -30px;
+      background: linear-gradient(135deg, #fff, #f7e7a6);
+      clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+      border: 5px solid #c9a227;
+      position: relative;
+      z-index: 4;
+      filter: drop-shadow(0 7px 4px rgba(0,0,0,0.18));
+    }
+
+    .mitre::before, .mitre::after {
+      content: "";
+      position: absolute;
+      background: #d62828;
+    }
+
+    .mitre::before {
+      left: 47px;
+      top: 27px;
+      width: 10px;
+      height: 70px;
+    }
+
+    .mitre::after {
+      left: 27px;
+      top: 56px;
+      width: 50px;
+      height: 9px;
+    }
+
+    .face {
+      width: 142px;
+      height: 142px;
+      border-radius: 50%;
+      background: #f1c39f;
+      border: 5px solid #704214;
+      margin: 0 auto;
+      position: relative;
+      z-index: 3;
+      box-shadow: inset 0 -15px 0 rgba(112,66,20,0.12);
+    }
+
+    .eye {
+      position: absolute;
+      top: 52px;
+      width: 17px;
+      height: 17px;
+      background: #151515;
+      border-radius: 50%;
+      animation: blink 4s infinite;
+    }
+
+    @keyframes blink {
+      0%, 94%, 100% { transform: scaleY(1); }
+      96% { transform: scaleY(0.12); }
+    }
+
+    .eye.left { left: 39px; }
+    .eye.right { right: 39px; }
+
+    .nose {
+      position: absolute;
+      top: 67px;
+      left: 63px;
+      width: 16px;
+      height: 23px;
+      border-radius: 50%;
+      background: rgba(112,66,20,0.2);
+    }
+
+    .beard {
+      position: absolute;
+      left: 18px;
+      bottom: 7px;
+      width: 96px;
+      height: 52px;
+      background: #f8fafc;
+      border-radius: 0 0 58px 58px;
+      border: 4px solid rgba(112,66,20,0.25);
+    }
+
+    .mouth {
+      position: absolute;
+      left: 54px;
+      bottom: 31px;
+      width: 35px;
+      height: 18px;
+      border-bottom: 5px solid #771d1d;
+      border-radius: 0 0 30px 30px;
+      z-index: 5;
+    }
+
+    .body-robe {
+      width: 158px;
+      height: 108px;
+      background: linear-gradient(90deg, #f8fafc, #ffffff, #e2e8f0);
+      border: 5px solid #cbd5e1;
+      border-radius: 45px 45px 20px 20px;
+      margin: -20px auto 0;
+      position: relative;
+      z-index: 2;
+    }
+
+    .body-robe::before {
+      content: "✚";
+      position: absolute;
+      top: 22px;
+      left: 0;
+      right: 0;
+      color: #d62828;
+      font-size: 38px;
+      font-weight: 1000;
+    }
+
+    .mystery-name {
+      position: relative;
+      z-index: 2;
+      font-weight: 1000;
+      font-size: 23px;
+      margin-top: 14px;
+      color: #4c2f00;
+    }
+
+    .pope-fact {
+      position: relative;
+      z-index: 2;
+      background: rgba(255,255,255,0.65);
+      border-radius: 16px;
+      padding: 10px;
+      font-size: 14px;
+      font-weight: 800;
+      color: #4b5563;
+      margin-top: 12px;
+      min-height: 55px;
+    }
+
+    .question-card {
+      background: rgba(0,0,0,0.25);
+      border: 1px solid rgba(255,255,255,0.13);
+      border-radius: 26px;
+      padding: 18px;
+      min-height: 378px;
+    }
+
+    .round-title {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 1000;
+      margin: 0 0 8px;
+      line-height: 1.05;
+    }
+
+    .prompt {
+      font-size: 18px;
+      color: #d5deef;
+      margin-bottom: 16px;
+      min-height: 52px;
+    }
+
+    .answers {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .answer {
+      border-radius: 18px;
+      padding: 16px;
+      text-align: left;
+      background: #f8fafc;
+      color: #172033;
+      min-height: 82px;
+      box-shadow: 0 8px 0 #94a3b8, 0 14px 20px rgba(0,0,0,0.25);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .answer::before {
+      content: attr(data-letter);
+      display: inline-grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      margin-right: 8px;
+      background: #1e293b;
+      color: white;
+      font-weight: 1000;
+    }
+
+    .answer.correct {
+      background: #bbf7d0;
+      box-shadow: 0 8px 0 #15803d, 0 14px 20px rgba(0,0,0,0.25);
+      animation: popCorrect 0.45s ease;
+    }
+
+    .answer.wrong {
+      background: #fecdd3;
+      box-shadow: 0 8px 0 #be123c, 0 14px 20px rgba(0,0,0,0.25);
+      animation: shake 0.34s ease;
+    }
+
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      25% { transform: translateX(-7px); }
+      50% { transform: translateX(7px); }
+      75% { transform: translateX(-4px); }
+    }
+
+    @keyframes popCorrect {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.06) rotate(-1deg); }
+      100% { transform: scale(1); }
+    }
+
+    .answer.disabled {
+      pointer-events: none;
+      filter: saturate(0.85);
+    }
+
+    .feedback {
+      margin-top: 18px;
+      min-height: 92px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      padding: 14px;
+      display: grid;
+      align-items: center;
+      color: #eef2ff;
+      font-size: 17px;
+      line-height: 1.3;
+    }
+
+    .feedback strong { color: var(--gold); }
+
+    .timer-shell {
+      height: 18px;
+      background: rgba(0,0,0,0.35);
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 0 0 16px;
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .timer-bar {
+      height: 100%;
       width: 100%;
-      height: auto;
+      background: linear-gradient(90deg, var(--green), var(--gold), var(--red));
+      border-radius: 999px;
+      transition: width 0.1s linear;
+    }
+
+    .side-panel {
+      padding: 16px;
+    }
+
+    .side-panel h3 {
+      margin: 0 0 10px;
+      font-size: 24px;
+    }
+
+    .rank-card, .mini-card {
+      background: rgba(0,0,0,0.24);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 20px;
+      padding: 13px;
+      margin-bottom: 12px;
+    }
+
+    .rank-title {
+      font-weight: 1000;
+      color: var(--gold);
+      font-size: 20px;
+    }
+
+    .rank-desc, .mini-card p {
+      color: #cbd5e1;
+      margin: 6px 0 0;
+      line-height: 1.36;
+      font-size: 14px;
+    }
+
+    .combo {
+      font-size: 38px;
+      font-weight: 1000;
+      color: var(--green);
+      text-align: center;
+      margin: 8px 0;
+      text-shadow: 0 5px 0 rgba(0,0,0,0.25);
+    }
+
+    .achievement-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .achievement {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 8px;
+      align-items: center;
+      background: rgba(255,255,255,0.06);
+      border-radius: 14px;
+      padding: 8px;
+      color: #dbeafe;
+      opacity: 0.55;
+    }
+
+    .achievement.unlocked {
+      opacity: 1;
+      background: rgba(6,214,160,0.16);
+      border: 1px solid rgba(6,214,160,0.35);
+    }
+
+    .achievement .icon {
+      font-size: 25px;
+    }
+
+    .achievement .text {
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .toast-zone {
+      position: fixed;
+      right: 14px;
+      bottom: 14px;
+      z-index: 50;
+      display: grid;
+      gap: 10px;
+      max-width: min(360px, calc(100vw - 28px));
+      pointer-events: none;
+    }
+
+    .toast {
+      background: #111827;
+      border: 1px solid rgba(255,255,255,0.18);
+      border-left: 7px solid var(--gold);
+      color: white;
+      border-radius: 18px;
+      padding: 12px 14px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.35);
+      font-weight: 900;
+      animation: toastIn 0.25s ease, toastOut 0.25s ease 2.5s forwards;
+    }
+
+    @keyframes toastIn {
+      from { transform: translateX(35px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes toastOut {
+      from { transform: translateX(0); opacity: 1; }
+      to { transform: translateX(35px); opacity: 0; }
+    }
+
+    .confetti-piece {
+      position: fixed;
+      top: -20px;
+      width: 10px;
+      height: 18px;
+      border-radius: 4px;
+      z-index: 60;
+      animation: confettiFall linear forwards;
+      pointer-events: none;
+    }
+
+    @keyframes confettiFall {
+      to { transform: translateY(calc(100vh + 60px)) rotate(720deg); opacity: 0.9; }
+    }
+
+    .flying-text {
+      position: fixed;
+      font-weight: 1000;
+      font-size: 28px;
+      color: var(--gold);
+      text-shadow: 0 3px 0 rgba(0,0,0,0.4);
+      pointer-events: none;
+      z-index: 70;
+      animation: flyUp 1s ease-out forwards;
+    }
+
+    @keyframes flyUp {
+      from { transform: translateY(0) scale(0.8); opacity: 0; }
+      15% { opacity: 1; }
+      to { transform: translateY(-90px) scale(1.2); opacity: 0; }
+    }
+
+    .pope-shuffle {
+      animation: popeShuffle 0.6s ease-in-out;
+    }
+
+    @keyframes popeShuffle {
+      0% { transform: rotate(0deg); }
+      20% { transform: rotate(6deg) scale(1.04); }
+      40% { transform: rotate(-7deg) scale(0.98); }
+      60% { transform: rotate(5deg) scale(1.03); }
+      80% { transform: rotate(-3deg); }
+      100% { transform: rotate(0deg); }
+    }
+
+    .keyboard-hint {
+      color: #9ca3af;
+      font-size: 13px;
+      text-align: center;
+      margin-top: 12px;
+      font-weight: 700;
+    }
+
+    .small {
+      font-size: 12px;
+      color: #aab6cb;
+      line-height: 1.35;
+    }
+
+    .end-score {
+      font-size: clamp(46px, 8vw, 86px);
+      font-weight: 1000;
+      color: var(--gold);
+      text-shadow: 0 7px 0 rgba(0,0,0,0.25);
+      line-height: 1;
+    }
+
+    .history {
+      max-height: 236px;
+      overflow: auto;
+      display: grid;
+      gap: 8px;
+      padding-right: 3px;
+    }
+
+    .history-item {
+      background: rgba(255,255,255,0.06);
+      border-radius: 12px;
+      padding: 8px 10px;
+      font-size: 13px;
+      color: #dbeafe;
+    }
+
+    .history-item.good { border-left: 5px solid var(--green); }
+    .history-item.bad { border-left: 5px solid var(--red); }
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 980px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .side-panel {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+
+      .side-panel h3 { grid-column: 1 / -1; }
+      .rank-card, .mini-card { margin-bottom: 0; }
+    }
+
+    @media (max-width: 720px) {
+      .topbar {
+        grid-template-columns: 1fr;
+      }
+      .button-row { justify-content: flex-start; }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .question-wrap { grid-template-columns: 1fr; }
+      .pope-card { min-height: 300px; }
+      .pope-avatar { height: 190px; }
+      .answers { grid-template-columns: 1fr; }
+      .mode-grid { grid-template-columns: 1fr; }
+      .side-panel { grid-template-columns: 1fr; }
+      .game-panel { min-height: 760px; }
     }
   </style>
 </head>
 <body>
-  <main>
-    <h1>NameThatPope</h1>
-    <div class="viewer">
-      <img src="assets/Photo%201.jpg" alt="Uploaded NameThatPope file">
-    </div>
-  </main>
+  <div class="page">
+    <header class="topbar">
+      <div class="title-wrap">
+        <div class="logo" aria-hidden="true">⛪</div>
+        <div>
+          <h1>Name That Pope!</h1>
+          <div class="subtitle">A ridiculous Vatican quiz show with holy combos, fake relics, and aggressively specific trivia.</div>
+        </div>
+      </div>
+      <div class="button-row">
+        <button id="soundButton" class="secondary" type="button">🔊 Sound On</button>
+        <button id="howButton" class="secondary" type="button">❔ How To Play</button>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="panel game-panel">
+        <div class="stats">
+          <div class="stat"><div class="stat-label">Score</div><div id="score" class="stat-value">0</div></div>
+          <div class="stat"><div class="stat-label">Round</div><div id="round" class="stat-value">0/10</div></div>
+          <div class="stat"><div class="stat-label">Streak</div><div id="streak" class="stat-value">0</div></div>
+          <div class="stat"><div class="stat-label">Blessings</div><div id="blessings" class="stat-value">3</div></div>
+        </div>
+
+        <div class="stage">
+          <section id="startScreen" class="screen active">
+            <div class="start-card">
+              <h2>Welcome, contestant.</h2>
+              <p>Your mission is simple: look at the clue, pick the correct pope, and try not to get excommunicated by multiple choice.</p>
+              <p>Choose a game mode:</p>
+
+              <div class="mode-grid" id="modeGrid">
+                <div class="mode selected" data-mode="normal">
+                  <div class="emoji">😇</div>
+                  <div class="name">Sunday School</div>
+                  <div class="desc">10 rounds. Funny but fair. A healthy amount of hat.</div>
+                </div>
+                <div class="mode" data-mode="chaos">
+                  <div class="emoji">🕊️</div>
+                  <div class="name">Papal Panic</div>
+                  <div class="desc">12 rounds. Less time. More nonsense. Doves may interfere.</div>
+                </div>
+                <div class="mode" data-mode="endless">
+                  <div class="emoji">🏆</div>
+                  <div class="name">Conclave Endless</div>
+                  <div class="desc">Keep going until your blessings run out. Glory is temporary. Hats are forever.</div>
+                </div>
+              </div>
+
+              <button id="startButton" class="green" type="button">Start The Conclave</button>
+              <div class="keyboard-hint">Keyboard: 1-4 to answer, B for blessing, Space for next round.</div>
+            </div>
+          </section>
+
+          <section id="gameScreen" class="screen">
+            <div class="timer-shell" aria-label="Timer">
+              <div id="timerBar" class="timer-bar"></div>
+            </div>
+            <div class="question-wrap">
+              <div id="popeCard" class="pope-card">
+                <div class="pope-avatar" aria-hidden="true">
+                  <div class="mitre"></div>
+                  <div class="face">
+                    <div class="eye left"></div>
+                    <div class="eye right"></div>
+                    <div class="nose"></div>
+                    <div class="beard"></div>
+                    <div class="mouth"></div>
+                  </div>
+                  <div class="body-robe"></div>
+                </div>
+                <div id="mysteryName" class="mystery-name">Mystery Pope</div>
+                <div id="popeFact" class="pope-fact">Waiting for the white smoke...</div>
+              </div>
+
+              <div class="question-card">
+                <h2 id="roundTitle" class="round-title">Round 1</h2>
+                <div id="prompt" class="prompt">Which pope matches this clue?</div>
+                <div id="answers" class="answers"></div>
+                <div id="feedback" class="feedback">Pick wisely. The Swiss Guard is pretending not to judge you.</div>
+                <div class="button-row" style="margin-top:14px; justify-content:flex-start;">
+                  <button id="blessingButton" type="button">🙏 Use Blessing</button>
+                  <button id="nextButton" class="secondary hidden" type="button">Next Round</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section id="endScreen" class="screen">
+            <div class="end-card">
+              <h2 id="endTitle">Conclave Complete!</h2>
+              <div id="endScore" class="end-score">0</div>
+              <p id="endMessage">You have achieved a level of papal naming that historians will describe as “technically a thing that happened.”</p>
+              <div class="button-row" style="justify-content:center; margin-top:18px;">
+                <button id="playAgainButton" class="green" type="button">Play Again</button>
+                <button id="shareButton" type="button">Copy Brag</button>
+              </div>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <aside class="panel side-panel">
+        <h3>Vatican Dashboard</h3>
+        <div class="rank-card">
+          <div class="rank-title" id="rankTitle">Rank: Altar Server Intern</div>
+          <div class="rank-desc" id="rankDesc">Answer questions to climb the holy corporate ladder.</div>
+          <div class="combo" id="comboText">x1</div>
+          <div class="small">Combo increases for correct streaks. Wrong answers reset it because bureaucracy.</div>
+        </div>
+
+        <div class="mini-card">
+          <h3 style="font-size:20px;margin:0 0 8px;">Achievements</h3>
+          <div class="achievement-list" id="achievementList"></div>
+        </div>
+
+        <div class="mini-card">
+          <h3 style="font-size:20px;margin:0 0 8px;">Last Answers</h3>
+          <div id="history" class="history"><div class="small">No answers yet. The parchment is blank.</div></div>
+        </div>
+
+        <div class="mini-card">
+          <h3 style="font-size:20px;margin:0 0 8px;">Emergency Theology</h3>
+          <p><strong>Blessing:</strong> removes two wrong answers. Use it when every pope name starts sounding like a pasta shape.</p>
+          <p class="small">This is a silly trivia game, not a seminary entrance exam. Some clue wording is intentionally goofy.</p>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <div id="toastZone" class="toast-zone" aria-live="polite"></div>
+
+  <script>
+    "use strict";
+
+    const popeData = [
+      {
+        name: "Peter",
+        display: "Pope Peter",
+        clue: "Traditionally considered the first pope. Also the patron saint of holding very important keys.",
+        funny: "Big key ring energy. Absolute locksmith vibes.",
+        era: "1st century",
+        tag: "Keymaster Supreme"
+      },
+      {
+        name: "Leo I",
+        display: "Pope Leo I",
+        clue: "Known as Leo the Great. He met Attila the Hun and somehow made that meeting less murdery.",
+        funny: "Diplomacy stat: 99. Armor stat: probably sandals.",
+        era: "440-461",
+        tag: "Hun Negotiator"
+      },
+      {
+        name: "Gregory I",
+        display: "Pope Gregory I",
+        clue: "Known as Gregory the Great. Associated with Gregorian chant, which is basically medieval lo-fi study beats.",
+        funny: "Dropped the hottest monk playlist of the early Middle Ages.",
+        era: "590-604",
+        tag: "Chant Influencer"
+      },
+      {
+        name: "Urban II",
+        display: "Pope Urban II",
+        clue: "Called the Council of Clermont in 1095 and launched the First Crusade.",
+        funny: "Not actually named Suburban II, despite strong zoning-board energy.",
+        era: "1088-1099",
+        tag: "Clermont Megaphone"
+      },
+      {
+        name: "Innocent III",
+        display: "Pope Innocent III",
+        clue: "One of the most powerful medieval popes. The name says innocent, the resume says CEO of Europe.",
+        funny: "Middle management? No. Maximum management.",
+        era: "1198-1216",
+        tag: "Medieval Boss Mode"
+      },
+      {
+        name: "Boniface VIII",
+        display: "Pope Boniface VIII",
+        clue: "Issued Unam Sanctam and had a dramatic feud with Philip IV of France.",
+        funny: "Entered the chat. Immediately made it constitutional crisis flavored.",
+        era: "1294-1303",
+        tag: "Drama Cardinal"
+      },
+      {
+        name: "Clement V",
+        display: "Pope Clement V",
+        clue: "First Avignon pope. Moved the papal residence to France, presumably for the pastries.",
+        funny: "Packed one robe, twelve hats, and a suspicious amount of cheese.",
+        era: "1305-1314",
+        tag: "Avignon Relocation"
+      },
+      {
+        name: "Julius II",
+        display: "Pope Julius II",
+        clue: "Patron of Michelangelo and the Sistine Chapel ceiling. Also nicknamed the Warrior Pope.",
+        funny: "Commissioned art like a museum director. Fought wars like a final boss.",
+        era: "1503-1513",
+        tag: "Ceiling Commissioner"
+      },
+      {
+        name: "Leo X",
+        display: "Pope Leo X",
+        clue: "Medici pope during the early Reformation. Allegedly spent money with the confidence of a man holding someone else's credit card.",
+        funny: "Renaissance luxury DLC unlocked.",
+        era: "1513-1521",
+        tag: "Medici Money Cannon"
+      },
+      {
+        name: "Paul III",
+        display: "Pope Paul III",
+        clue: "Opened the Council of Trent, a major Catholic response to the Reformation.",
+        funny: "Called the meeting. The meeting lasted eighteen years. Classic committee behavior.",
+        era: "1534-1549",
+        tag: "Meeting Scheduler"
+      },
+      {
+        name: "Pius IX",
+        display: "Pope Pius IX",
+        clue: "Longest verified papal reign. Also pope during the loss of the Papal States.",
+        funny: "Longest shift ever. HR still has not approved overtime.",
+        era: "1846-1878",
+        tag: "Long Reign Legend"
+      },
+      {
+        name: "Leo XIII",
+        display: "Pope Leo XIII",
+        clue: "Issued Rerum Novarum, a major document on labor and social teaching.",
+        funny: "Saw industrial capitalism and said, 'We need a memo.'",
+        era: "1878-1903",
+        tag: "Labor Memo Pope"
+      },
+      {
+        name: "Pius XII",
+        display: "Pope Pius XII",
+        clue: "Led the Church during World War II. One of the most debated modern popes.",
+        funny: "The history books put this one in hard mode.",
+        era: "1939-1958",
+        tag: "Difficult History Round"
+      },
+      {
+        name: "John XXIII",
+        display: "Pope John XXIII",
+        clue: "Called the Second Vatican Council. Known for warmth, humor, and opening windows both literal and metaphorical.",
+        funny: "Vatican II: the patch update was not small.",
+        era: "1958-1963",
+        tag: "Window Opener"
+      },
+      {
+        name: "Paul VI",
+        display: "Pope Paul VI",
+        clue: "Concluded Vatican II and implemented many of its reforms.",
+        funny: "Inherited the group project and actually submitted it.",
+        era: "1963-1978",
+        tag: "Council Finisher"
+      },
+      {
+        name: "John Paul I",
+        display: "Pope John Paul I",
+        clue: "Known as the Smiling Pope. His papacy lasted only 33 days.",
+        funny: "Speedrun category: Papacy Any Percent.",
+        era: "1978",
+        tag: "Smiling Speedrun"
+      },
+      {
+        name: "John Paul II",
+        display: "Pope John Paul II",
+        clue: "Polish pope, major world traveler, and one of the longest-serving popes in modern history.",
+        funny: "Had more stamps in his passport than a suitcase with ambition.",
+        era: "1978-2005",
+        tag: "Globe-Trotting Pope"
+      },
+      {
+        name: "Benedict XVI",
+        display: "Pope Benedict XVI",
+        clue: "German theologian who resigned in 2013, the first pope to resign in centuries.",
+        funny: "Looked at the job and said, 'Actually, retirement sounds theological.'",
+        era: "2005-2013",
+        tag: "Retirement Pioneer"
+      },
+      {
+        name: "Francis",
+        display: "Pope Francis",
+        clue: "First pope from the Americas, first Jesuit pope, and famously fond of simpler papal style.",
+        funny: "Skipped the fancy apartment like it had a surprise subscription fee.",
+        era: "2013-2025",
+        tag: "Jesuit From Argentina"
+      },
+      {
+        name: "Leo XIV",
+        display: "Pope Leo XIV",
+        clue: "The first pope from the United States, elected in 2025.",
+        funny: "America finally exported something besides streaming services and ranch dressing.",
+        era: "2025-",
+        tag: "Chicago-adjacent Plot Twist"
+      }
+    ];
+
+    const fakeRelics = [
+      "The Blessed Spreadsheet of Parish Potluck RSVPs",
+      "A sandal allegedly worn by three different apostles and one confused tourist",
+      "The Holy Stapler of Canon Law Compliance",
+      "A tiny spoon used to stir extremely serious espresso",
+      "The ceremonial remote that controls the Sistine Chapel ceiling fan",
+      "The Emergency Backup Mitre, size medium",
+      "The Vatican Lost-and-Found Bin of Mildly Sacred Umbrellas",
+      "The ancient scroll labeled 'Do Not Open Until Committee Meeting'"
+    ];
+
+    const chaosPrompts = [
+      "A pigeon wearing a tiny cardinal hat has entered the arena.",
+      "White smoke? Gray smoke? Someone is vaping near the chimney again.",
+      "The Swiss Guard has started a conga line. Morale is high. Accuracy is uncertain.",
+      "A monk just yelled 'enhance!' at a parchment.",
+      "The bells are ringing, but one of them is definitely a microwave.",
+      "Your mitre has been upgraded to business class.",
+      "A footnote escaped from a theology textbook and is now loose in the building.",
+      "Emergency incense levels are approaching fog machine territory."
+    ];
+
+    const achievements = [
+      { id: "first", icon: "🔔", title: "First Bell", desc: "Answer one correctly." },
+      { id: "streak3", icon: "🔥", title: "Holy Heater", desc: "Get a 3-answer streak." },
+      { id: "streak5", icon: "👑", title: "Mitre Monster", desc: "Get a 5-answer streak." },
+      { id: "noBless", icon: "🧠", title: "No Blessings Needed", desc: "Reach 5 rounds without using a blessing." },
+      { id: "fast", icon: "⚡", title: "Fast Canonization", desc: "Answer with 70% timer left." },
+      { id: "perfect", icon: "🏆", title: "Basically Vatican Jeopardy", desc: "Finish with no wrong answers." }
+    ];
+
+    const state = {
+      mode: "normal",
+      score: 0,
+      round: 0,
+      maxRounds: 10,
+      streak: 0,
+      bestStreak: 0,
+      blessings: 3,
+      combo: 1,
+      current: null,
+      currentOptions: [],
+      answered: false,
+      timer: null,
+      timeTotal: 16,
+      timeLeft: 16,
+      sound: true,
+      wrongAnswers: 0,
+      blessingsUsed: 0,
+      history: [],
+      unlocked: new Set(),
+      usedPopes: []
+    };
+
+    const els = {
+      score: document.getElementById("score"),
+      round: document.getElementById("round"),
+      streak: document.getElementById("streak"),
+      blessings: document.getElementById("blessings"),
+      timerBar: document.getElementById("timerBar"),
+      startScreen: document.getElementById("startScreen"),
+      gameScreen: document.getElementById("gameScreen"),
+      endScreen: document.getElementById("endScreen"),
+      startButton: document.getElementById("startButton"),
+      playAgainButton: document.getElementById("playAgainButton"),
+      shareButton: document.getElementById("shareButton"),
+      soundButton: document.getElementById("soundButton"),
+      howButton: document.getElementById("howButton"),
+      modeGrid: document.getElementById("modeGrid"),
+      answers: document.getElementById("answers"),
+      prompt: document.getElementById("prompt"),
+      feedback: document.getElementById("feedback"),
+      roundTitle: document.getElementById("roundTitle"),
+      mysteryName: document.getElementById("mysteryName"),
+      popeFact: document.getElementById("popeFact"),
+      popeCard: document.getElementById("popeCard"),
+      blessingButton: document.getElementById("blessingButton"),
+      nextButton: document.getElementById("nextButton"),
+      rankTitle: document.getElementById("rankTitle"),
+      rankDesc: document.getElementById("rankDesc"),
+      comboText: document.getElementById("comboText"),
+      achievementList: document.getElementById("achievementList"),
+      history: document.getElementById("history"),
+      toastZone: document.getElementById("toastZone"),
+      endTitle: document.getElementById("endTitle"),
+      endScore: document.getElementById("endScore"),
+      endMessage: document.getElementById("endMessage")
+    };
+
+    function randInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function sample(array) {
+      return array[Math.floor(Math.random() * array.length)];
+    }
+
+    function shuffle(array) {
+      const copy = array.slice();
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function showScreen(name) {
+      els.startScreen.classList.remove("active");
+      els.gameScreen.classList.remove("active");
+      els.endScreen.classList.remove("active");
+      if (name === "start") els.startScreen.classList.add("active");
+      if (name === "game") els.gameScreen.classList.add("active");
+      if (name === "end") els.endScreen.classList.add("active");
+    }
+
+    function updateStats() {
+      els.score.textContent = state.score;
+      els.round.textContent = state.mode === "endless" ? String(state.round) : state.round + "/" + state.maxRounds;
+      els.streak.textContent = state.streak;
+      els.blessings.textContent = state.blessings;
+      els.comboText.textContent = "x" + state.combo;
+      const rank = getRank();
+      els.rankTitle.textContent = "Rank: " + rank.title;
+      els.rankDesc.textContent = rank.desc;
+    }
+
+    function getRank() {
+      if (state.score >= 9000) return { title: "Canonization Speedrunner", desc: "The saints are checking your leaderboard placement." };
+      if (state.score >= 6500) return { title: "Supreme Hat Strategist", desc: "Your mitre has its own LinkedIn profile." };
+      if (state.score >= 4000) return { title: "Basilica Brainiac", desc: "You know enough to make a docent nervous." };
+      if (state.score >= 2200) return { title: "Cardinal of Clicking", desc: "You are one red hat away from dangerous confidence." };
+      if (state.score >= 900) return { title: "Incense Apprentice", desc: "Mostly accurate. Slightly smoky." };
+      return { title: "Altar Server Intern", desc: "Answer questions to climb the holy corporate ladder." };
+    }
+
+    function renderAchievements() {
+      els.achievementList.innerHTML = "";
+      achievements.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "achievement" + (state.unlocked.has(item.id) ? " unlocked" : "");
+        div.innerHTML = '<div class="icon">' + item.icon + '</div><div><div class="text">' + item.title + '</div><div class="small">' + item.desc + '</div></div>';
+        els.achievementList.appendChild(div);
+      });
+    }
+
+    function unlock(id) {
+      const ach = achievements.find(a => a.id === id);
+      if (!ach || state.unlocked.has(id)) return;
+      state.unlocked.add(id);
+      renderAchievements();
+      toast("Achievement unlocked: " + ach.icon + " " + ach.title);
+      playTone(720, 0.08, "sine");
+      setTimeout(() => playTone(960, 0.1, "sine"), 90);
+    }
+
+    function toast(message) {
+      const div = document.createElement("div");
+      div.className = "toast";
+      div.textContent = message;
+      els.toastZone.appendChild(div);
+      setTimeout(() => div.remove(), 2900);
+    }
+
+    function playTone(freq, duration, type) {
+      if (!state.sound) return;
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const ctx = new AudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = type || "square";
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.045, ctx.currentTime + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + duration + 0.02);
+        setTimeout(() => ctx.close(), (duration + 0.05) * 1000);
+      } catch (err) {
+        // Audio is optional. Some browsers block it until user interaction.
+      }
+    }
+
+    function startGame() {
+      state.score = 0;
+      state.round = 0;
+      state.streak = 0;
+      state.bestStreak = 0;
+      state.combo = 1;
+      state.wrongAnswers = 0;
+      state.blessingsUsed = 0;
+      state.history = [];
+      state.unlocked = new Set();
+      state.usedPopes = [];
+      state.blessings = state.mode === "chaos" ? 2 : 3;
+      state.maxRounds = state.mode === "chaos" ? 12 : 10;
+      state.timeTotal = state.mode === "chaos" ? 11 : 16;
+      renderAchievements();
+      renderHistory();
+      showScreen("game");
+      updateStats();
+      toast("The conclave has begun. Try not to panic dramatically.");
+      nextRound();
+    }
+
+    function nextRound() {
+      clearInterval(state.timer);
+      state.answered = false;
+      els.nextButton.classList.add("hidden");
+      els.blessingButton.disabled = false;
+      els.feedback.innerHTML = "Pick wisely. The Swiss Guard is pretending not to judge you.";
+      state.round += 1;
+
+      if (state.mode !== "endless" && state.round > state.maxRounds) {
+        endGame();
+        return;
+      }
+
+      if (state.mode === "endless" && state.blessings < 0) {
+        endGame();
+        return;
+      }
+
+      let available = popeData.filter(p => !state.usedPopes.includes(p.name));
+      if (available.length === 0) {
+        state.usedPopes = [];
+        available = popeData.slice();
+      }
+
+      const correct = sample(available);
+      state.usedPopes.push(correct.name);
+      const wrongs = shuffle(popeData.filter(p => p.name !== correct.name)).slice(0, 3);
+      state.current = correct;
+      state.currentOptions = shuffle([correct, ...wrongs]);
+
+      els.roundTitle.textContent = state.mode === "endless" ? "Conclave Round " + state.round : "Round " + state.round;
+      els.prompt.textContent = correct.clue;
+      els.mysteryName.textContent = "Mystery Pope";
+      els.popeFact.textContent = sample(chaosPrompts);
+      els.popeCard.classList.remove("pope-shuffle");
+      void els.popeCard.offsetWidth;
+      els.popeCard.classList.add("pope-shuffle");
+      renderAnswers();
+      startTimer();
+      updateStats();
+
+      if (state.mode === "chaos" && Math.random() < 0.34) {
+        setTimeout(triggerChaosEvent, 700);
+      }
+    }
+
+    function renderAnswers() {
+      const letters = ["1", "2", "3", "4"];
+      els.answers.innerHTML = "";
+      state.currentOptions.forEach((option, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "answer";
+        button.dataset.letter = letters[index];
+        button.textContent = option.display;
+        button.addEventListener("click", () => chooseAnswer(option, button));
+        els.answers.appendChild(button);
+      });
+    }
+
+    function startTimer() {
+      state.timeLeft = Math.max(7, state.timeTotal - Math.floor(state.round / 5));
+      const original = state.timeLeft;
+      state.timer = setInterval(() => {
+        state.timeLeft -= 0.1;
+        const percent = Math.max(0, state.timeLeft / original) * 100;
+        els.timerBar.style.width = percent + "%";
+        if (state.timeLeft <= 0) {
+          clearInterval(state.timer);
+          timeOut();
+        }
+      }, 100);
+    }
+
+    function chooseAnswer(option, button) {
+      if (state.answered) return;
+      state.answered = true;
+      clearInterval(state.timer);
+      const buttons = Array.from(els.answers.querySelectorAll(".answer"));
+      buttons.forEach(btn => btn.classList.add("disabled"));
+      const correctButton = buttons.find(btn => btn.textContent === state.current.display);
+      const wasCorrect = option.name === state.current.name;
+      const timerPercent = Math.max(0, state.timeLeft / Math.max(1, state.timeTotal));
+
+      if (wasCorrect) {
+        button.classList.add("correct");
+        handleCorrect(timerPercent);
+      } else {
+        button.classList.add("wrong");
+        if (correctButton) correctButton.classList.add("correct");
+        handleWrong("wrong");
+      }
+
+      els.mysteryName.textContent = state.current.display;
+      els.popeFact.textContent = state.current.tag + " • " + state.current.era;
+      els.nextButton.classList.remove("hidden");
+      els.blessingButton.disabled = true;
+      updateStats();
+    }
+
+    function handleCorrect(timerPercent) {
+      state.streak += 1;
+      state.bestStreak = Math.max(state.bestStreak, state.streak);
+      state.combo = 1 + Math.floor(state.streak / 2);
+      const base = 300;
+      const speedBonus = Math.round(timerPercent * 220);
+      const streakBonus = state.streak * 45;
+      const earned = Math.round((base + speedBonus + streakBonus) * state.combo);
+      state.score += earned;
+
+      els.feedback.innerHTML = "<strong>Correct!</strong> " + state.current.funny + "<br>You earned <strong>" + earned + "</strong> points. The bells are contractually obligated to ring.";
+      addHistory(true, state.current.display + " — +" + earned);
+      flyingText("+" + earned, "good");
+      confetti(24);
+      playTone(523, 0.08, "triangle");
+      setTimeout(() => playTone(659, 0.08, "triangle"), 90);
+      setTimeout(() => playTone(784, 0.12, "triangle"), 180);
+
+      unlock("first");
+      if (state.streak >= 3) unlock("streak3");
+      if (state.streak >= 5) unlock("streak5");
+      if (timerPercent > 0.7) unlock("fast");
+      if (state.round >= 5 && state.blessingsUsed === 0) unlock("noBless");
+    }
+
+    function handleWrong(kind) {
+      state.wrongAnswers += 1;
+      state.streak = 0;
+      state.combo = 1;
+      if (state.mode === "endless") state.blessings -= 1;
+      const reason = kind === "timeout" ? "Time is up!" : "Nope!";
+      els.feedback.innerHTML = "<strong>" + reason + "</strong> It was <strong>" + state.current.display + "</strong>. " + state.current.funny;
+      addHistory(false, state.current.display + " — missed");
+      playTone(180, 0.12, "sawtooth");
+      setTimeout(() => playTone(130, 0.15, "sawtooth"), 130);
+      if (state.mode === "endless" && state.blessings < 0) {
+        setTimeout(endGame, 900);
+      }
+    }
+
+    function timeOut() {
+      if (state.answered) return;
+      state.answered = true;
+      const buttons = Array.from(els.answers.querySelectorAll(".answer"));
+      buttons.forEach(btn => {
+        btn.classList.add("disabled");
+        if (btn.textContent === state.current.display) btn.classList.add("correct");
+      });
+      els.mysteryName.textContent = state.current.display;
+      els.popeFact.textContent = state.current.tag + " • " + state.current.era;
+      els.nextButton.classList.remove("hidden");
+      els.blessingButton.disabled = true;
+      handleWrong("timeout");
+      updateStats();
+    }
+
+    function useBlessing() {
+      if (state.answered || state.blessings <= 0) {
+        toast(state.blessings <= 0 ? "No blessings left. The paperwork was denied." : "Too late. The answer is already on parchment.");
+        return;
+      }
+      state.blessings -= 1;
+      state.blessingsUsed += 1;
+      const buttons = Array.from(els.answers.querySelectorAll(".answer"));
+      const wrongButtons = shuffle(buttons.filter(btn => btn.textContent !== state.current.display && !btn.classList.contains("hidden")));
+      wrongButtons.slice(0, 2).forEach(btn => {
+        btn.classList.add("hidden");
+      });
+      els.feedback.innerHTML = "🙏 <strong>Blessing used!</strong> Two wrong answers vanished into a very tasteful cloud of incense.";
+      updateStats();
+      playTone(440, 0.08, "sine");
+      setTimeout(() => playTone(660, 0.11, "sine"), 100);
+    }
+
+    function triggerChaosEvent() {
+      if (state.answered) return;
+      const event = randInt(1, 4);
+      if (event === 1) {
+        state.timeLeft += 2.5;
+        toast("Bonus incense cloud: +2.5 seconds!");
+      } else if (event === 2) {
+        els.popeFact.textContent = "Relic check: " + sample(fakeRelics);
+        toast("A fake relic appeared. It does nothing, but confidently.");
+      } else if (event === 3) {
+        state.score += 100;
+        toast("A cardinal dropped 100 points on the marble floor. You kept them.");
+        flyingText("+100", "good");
+      } else {
+        const buttons = Array.from(els.answers.querySelectorAll(".answer"));
+        buttons.forEach(btn => btn.style.transform = "rotate(" + randInt(-3, 3) + "deg)");
+        toast("Papal paperwork shuffled the answer cards. Visually only. Probably.");
+      }
+      updateStats();
+    }
+
+    function addHistory(good, text) {
+      state.history.unshift({ good, text });
+      state.history = state.history.slice(0, 8);
+      renderHistory();
+    }
+
+    function renderHistory() {
+      els.history.innerHTML = "";
+      if (state.history.length === 0) {
+        els.history.innerHTML = '<div class="small">No answers yet. The parchment is blank.</div>';
+        return;
+      }
+      state.history.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "history-item " + (item.good ? "good" : "bad");
+        div.textContent = (item.good ? "✅ " : "❌ ") + item.text;
+        els.history.appendChild(div);
+      });
+    }
+
+    function endGame() {
+      clearInterval(state.timer);
+      showScreen("end");
+      if (state.wrongAnswers === 0 && state.round > 1) unlock("perfect");
+      const title = state.score >= 6500 ? "Habemus Champion!" : state.score >= 3000 ? "Respectable Conclave!" : "The Conclave Has Notes";
+      els.endTitle.textContent = title;
+      els.endScore.textContent = state.score;
+      const accuracyRounds = Math.max(1, state.mode === "endless" ? state.round : Math.min(state.round - 1, state.maxRounds));
+      const correct = Math.max(0, accuracyRounds - state.wrongAnswers);
+      const accuracy = Math.round((correct / accuracyRounds) * 100);
+      els.endMessage.textContent = getEndMessage(accuracy);
+      updateStats();
+      if (state.score >= 3000) confetti(80);
+    }
+
+    function getEndMessage(accuracy) {
+      if (accuracy >= 95) return "Nearly flawless. Somewhere, a tiny bell just got promoted.";
+      if (accuracy >= 80) return "Strong performance. You may approach the hat rack with confidence.";
+      if (accuracy >= 60) return "Solid. Not canonization material, but definitely potluck committee material.";
+      if (accuracy >= 40) return "You survived. History remains concerned, but entertained.";
+      return "That was less 'Name That Pope' and more 'Guess That Very Old Guy.' Still noble.";
+    }
+
+    function flyingText(text) {
+      const div = document.createElement("div");
+      div.className = "flying-text";
+      div.textContent = text;
+      div.style.left = randInt(120, Math.max(130, window.innerWidth - 220)) + "px";
+      div.style.top = randInt(160, Math.max(170, window.innerHeight - 180)) + "px";
+      document.body.appendChild(div);
+      setTimeout(() => div.remove(), 1050);
+    }
+
+    function confetti(count) {
+      const colors = ["#ffd166", "#ef476f", "#06d6a0", "#118ab2", "#ffffff", "#c084fc"];
+      for (let i = 0; i < count; i++) {
+        const piece = document.createElement("div");
+        piece.className = "confetti-piece";
+        piece.style.left = Math.random() * 100 + "vw";
+        piece.style.background = sample(colors);
+        piece.style.animationDuration = randInt(900, 1900) + "ms";
+        piece.style.animationDelay = randInt(0, 250) + "ms";
+        piece.style.transform = "rotate(" + randInt(0, 360) + "deg)";
+        document.body.appendChild(piece);
+        setTimeout(() => piece.remove(), 2300);
+      }
+    }
+
+    function showHowToPlay() {
+      toast("Pick the pope that matches the clue. Correct answers build combo. Blessings erase two wrong answers. In Endless, wrong answers cost blessings.");
+    }
+
+    async function copyBrag() {
+      const brag = "I scored " + state.score + " in Name That Pope! My rank: " + getRank().title + ". The mitre recognizes my authority.";
+      try {
+        await navigator.clipboard.writeText(brag);
+        toast("Brag copied. Use this power irresponsibly but politely.");
+      } catch (err) {
+        toast(brag);
+      }
+    }
+
+    els.startButton.addEventListener("click", startGame);
+    els.playAgainButton.addEventListener("click", () => showScreen("start"));
+    els.nextButton.addEventListener("click", nextRound);
+    els.blessingButton.addEventListener("click", useBlessing);
+    els.howButton.addEventListener("click", showHowToPlay);
+    els.shareButton.addEventListener("click", copyBrag);
+    els.soundButton.addEventListener("click", () => {
+      state.sound = !state.sound;
+      els.soundButton.textContent = state.sound ? "🔊 Sound On" : "🔇 Sound Off";
+      toast(state.sound ? "Sound on. Bells armed." : "Sound off. Silent monastery mode.");
+    });
+
+    els.modeGrid.addEventListener("click", event => {
+      const mode = event.target.closest(".mode");
+      if (!mode) return;
+      state.mode = mode.dataset.mode;
+      Array.from(els.modeGrid.querySelectorAll(".mode")).forEach(item => item.classList.remove("selected"));
+      mode.classList.add("selected");
+    });
+
+    document.addEventListener("keydown", event => {
+      const key = event.key.toLowerCase();
+      if (key >= "1" && key <= "4" && els.gameScreen.classList.contains("active")) {
+        const index = Number(key) - 1;
+        const buttons = Array.from(els.answers.querySelectorAll(".answer:not(.hidden)"));
+        const allButtons = Array.from(els.answers.querySelectorAll(".answer"));
+        const target = allButtons[index];
+        if (target && !target.classList.contains("hidden")) target.click();
+      }
+      if (key === "b" && els.gameScreen.classList.contains("active")) useBlessing();
+      if ((key === " " || key === "enter") && els.gameScreen.classList.contains("active") && !els.nextButton.classList.contains("hidden")) {
+        event.preventDefault();
+        nextRound();
+      }
+    });
+
+    renderAchievements();
+    updateStats();
+  </script>
 </body>
 </html>
