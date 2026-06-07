@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NameThatPope</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f4f0e8;
+      color: #1c1b18;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    main {
+      width: min(100%, 920px);
+      display: grid;
+      gap: 18px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 6vw, 4rem);
+      line-height: 1;
+      text-align: center;
+    }
+
+    .viewer {
+      overflow: hidden;
+      border: 1px solid rgba(28, 27, 24, 0.18);
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.16);
+    }
+
+    img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>NameThatPope</h1>
+    <div class="viewer">
+      <img src="assets/Photo%201.jpg" alt="Uploaded NameThatPope file">
+    </div>
+  </main>
+</body>
+</html>
